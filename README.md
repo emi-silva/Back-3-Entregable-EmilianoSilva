@@ -38,8 +38,6 @@ Esto abrirá automáticamente el navegador en `http://localhost:8080`.
 - Código modular y organizado.
 
 ## Pruebas
-Puedes usar Postman, Insomnia o el navegador para probar los endpoints en `http://localhost:8080`.
+Usar Postman, Insomnia o el navegador para probar los endpoints en `http://localhost:8080`.
 
----
 
-Si necesitas agregar más funcionalidades, ¡avísame!
