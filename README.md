@@ -19,13 +19,13 @@ API completa para gestión de usuarios, mascotas y adopciones con documentación
 #### Opción 1: Usando imagen desde DockerHub
 ```bash
 # Descargar y ejecutar la imagen desde DockerHub
-docker run -p 8080:8080 --name backend3-app emisilva/backend3-entregable:latest
+docker run -p 8080:8080 --name backend3-app emilianosilva25/backend3-entregable:latest
 
 # Con variables de entorno personalizadas
-docker run -p 8080:8080 -e MONGODB_URI=mongodb://host.docker.internal:27017/back3 --name backend3-app emisilva/backend3-entregable:latest
+docker run -p 8080:8080 -e MONGODB_URI=mongodb://host.docker.internal:27017/back3 --name backend3-app emilianosilva25/backend3-entregable:latest
 ```
 
-**🔗 Imagen en DockerHub:** [emisilva/backend3-entregable](https://hub.docker.com/r/emisilva/backend3-entregable)
+**🔗 Imagen en DockerHub:** [emilianosilva25/backend3-entregable](https://hub.docker.com/r/emilianosilva25/backend3-entregable)
 
 #### Opción 2: Construir imagen localmente
 ```bash
@@ -41,7 +41,7 @@ docker run -p 8080:8080 --name backend3-app backend3-entregable
 version: '3.8'
 services:
   app:
-    image: emisilva/backend3-entregable:latest
+    image: emilianosilva25/backend3-entregable:latest
     ports:
       - "8080:8080"
     environment:
@@ -184,7 +184,7 @@ npm test -- --coverage
 ## 🐳 Información Docker
 
 ### Imagen en DockerHub
-- **Repositorio:** `emisilva/backend3-entregable`
+- **Repositorio:** `emilianosilva25/backend3-entregable`
 - **Tags disponibles:** `latest`, `v1.0.0`
 - **Tamaño:** ~150MB (optimizada con Alpine Linux)
 
