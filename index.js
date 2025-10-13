@@ -34,6 +34,69 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/public/index.html');
 });
 
+/**
+ * @swagger
+ * /health:
+ *   get:
+ *     summary: Verificar el estado de salud de la aplicación
+ *     tags: [Health]
+ *     responses:
+ *       200:
+ *         description: La aplicación está funcionando correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "OK"
+ *                 timestamp:
+ *                   type: string
+ *                   format: date-time
+ *                 uptime:
+ *                   type: number
+ *                   description: Tiempo de actividad en segundos
+ *                 database:
+ *                   type: string
+ *                   example: "connected"
+ *                 version:
+ *                   type: string
+ *                   example: "1.0.0"
+ *       503:
+ *         description: Error en el servicio
+ */
+app.get('/health', async (req, res) => {
+  try {
+    // Verificar conexión a la base de datos
+    const dbStatus = mongoose.connection.readyState === 1 ? 'connected' : 'disconnected';
+    
+    const healthCheck = {
+      status: 'OK',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      database: dbStatus,
+      version: require('./package.json').version || '1.0.0',
+      environment: process.env.NODE_ENV || 'development',
+      docker: !!process.env.DOCKER_ENV
+    };
+
+    // Si la base de datos no está conectada, devolver error 503
+    if (dbStatus !== 'connected') {
+      healthCheck.status = 'ERROR';
+      return res.status(503).json(healthCheck);
+    }
+
+    res.status(200).json(healthCheck);
+  } catch (error) {
+    res.status(503).json({
+      status: 'ERROR',
+      timestamp: new Date().toISOString(),
+      error: error.message
+    });
+  }
+});
+
 // Importar y usar los routers de usuarios, mascotas y adopciones
 const usersRouter = require('./routes/users.router');
 const petsRouter = require('./routes/pets.router');

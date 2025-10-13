@@ -30,6 +30,70 @@ router.get('/mockingpets', (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/mocks/generateData:
+ *   get:
+ *     summary: Genera datos mock sin insertar en base de datos
+ *     tags: [Mocks]
+ *     parameters:
+ *       - in: query
+ *         name: users
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Número de usuarios a generar
+ *       - in: query
+ *         name: pets
+ *         schema:
+ *           type: integer
+ *           default: 5
+ *         description: Número de mascotas a generar
+ *     responses:
+ *       200:
+ *         description: Datos mock generados exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 users:
+ *                   type: array
+ *                 pets:
+ *                   type: array
+ *                 message:
+ *                   type: string
+ *       500:
+ *         description: Error interno del servidor
+ */
+router.get('/generateData', (req, res) => {
+  try {
+    const users = parseInt(req.query.users) || 10;
+    const pets = parseInt(req.query.pets) || 5;
+    
+    const mockUsers = generateMockUsers(users);
+    const mockPets = generateMockPets(pets);
+    
+    res.json({
+      message: `Datos mock generados: ${users} usuarios y ${pets} mascotas`,
+      users: mockUsers,
+      pets: mockPets,
+      total: {
+        users: mockUsers.length,
+        pets: mockPets.length
+      }
+    });
+  } catch (error) {
+    // Fallback simple
+    const simpleData = generateSimpleMockData();
+    res.json({
+      message: 'Datos mock generados (fallback)',
+      users: Array(parseInt(req.query.users) || 10).fill(simpleData.users[0]),
+      pets: Array(parseInt(req.query.pets) || 5).fill(simpleData.pets[0])
+    });
+  }
+});
+
 module.exports = router;
 
 const User = require('../models/User');
