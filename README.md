@@ -1,7 +1,11 @@
-# Backend 3 Entregable
+# Backend 3 Entregable - API de Gestión de Adopciones
 
-## Instalación
+## 📋 Descripción
+API completa para gestión de usuarios, mascotas y adopciones con documentación Swagger, tests funcionales y contenedor Docker.
 
+## 🚀 Instalación
+
+### Instalación Local
 1. Clona el repositorio o descarga los archivos.
 2. Instala las dependencias:
    ```bash
@@ -10,34 +14,242 @@
 3. Instala MongoDB y asegúrate de que esté corriendo en `mongodb://localhost:27017/back3`.
 4. El servidor se ejecuta en el puerto 8080 por defecto.
 
-## Ejecución
+### Ejecutar con Docker 🐳
 
+#### Opción 1: Usando imagen desde DockerHub
+```bash
+# Descargar y ejecutar la imagen desde DockerHub
+docker run -p 8080:8080 --name backend3-app emisilva/backend3-entregable:latest
+
+# Con variables de entorno personalizadas
+docker run -p 8080:8080 -e MONGODB_URI=mongodb://host.docker.internal:27017/back3 --name backend3-app emisilva/backend3-entregable:latest
+```
+
+**🔗 Imagen en DockerHub:** [emisilva/backend3-entregable](https://hub.docker.com/r/emisilva/backend3-entregable)
+
+#### Opción 2: Construir imagen localmente
+```bash
+# Construir la imagen
+docker build -t backend3-entregable .
+
+# Ejecutar el contenedor
+docker run -p 8080:8080 --name backend3-app backend3-entregable
+```
+
+#### Docker Compose (Recomendado)
+```yaml
+version: '3.8'
+services:
+  app:
+    image: emisilva/backend3-entregable:latest
+    ports:
+      - "8080:8080"
+    environment:
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://mongo:27017/back3
+    depends_on:
+      - mongo
+    
+  mongo:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:
+```
+
+## 🏃‍♂️ Ejecución
+
+### Modo Desarrollo
 ```bash
 npm start
 ```
 Esto abrirá automáticamente el navegador en `http://localhost:8080`.
 
-## Endpoints principales
+### Modo Testing
+```bash
+# Ejecutar todos los tests
+npm test
 
+# Ejecutar tests en modo watch
+npm run test:watch
+```
+
+## 📚 Documentación API
+
+### Swagger/OpenAPI
+- **URL:** `http://localhost:8080/api-docs`
+- Documentación interactiva completa de todos los endpoints
+- Schemas de datos detallados
+- Ejemplos de request/response
+
+### Endpoints principales
 
 **Frontend:**
-  - `GET /` → Vista moderna en navegador (`http://localhost:8080/`)
+- `GET /` → Vista moderna en navegador
+- `GET /api-docs` → Documentación Swagger
 
-**API:**
-  - `GET /api/mocks/mockingpets` → Endpoint migrado
-  - `GET /api/mocks/mockingusers` → Genera 50 usuarios mock
-  - `POST /api/mocks/generateData` → Genera e inserta usuarios y mascotas (body: `{ "users": 10, "pets": 5 }`)
-  - `GET /api/users` → Lista todos los usuarios
-  - `GET /api/pets` → Lista todas las mascotas
+**API - Mocks:**
+- `GET /api/mocks/mockingpets` → Endpoint migrado
+- `GET /api/mocks/mockingusers` → Genera 50 usuarios mock
+- `POST /api/mocks/generateData` → Genera e inserta usuarios y mascotas
 
-## Mejoras implementadas
+**API - Usuarios:**
+- `GET /api/users` → Lista todos los usuarios
+- `GET /api/users/:id` → Obtiene usuario por ID
+- `POST /api/users` → Crea nuevo usuario
+- `PUT /api/users/:id` → Actualiza usuario
+- `DELETE /api/users/:id` → Elimina usuario
 
-- Validación de parámetros en `/generateData`.
-- Mensajes de error claros y descriptivos.
-- Frontend moderno con Bootstrap.
-- Código modular y organizado.
+**API - Mascotas:**
+- `GET /api/pets` → Lista todas las mascotas
+- `POST /api/pets` → Crea nueva mascota
+- `PUT /api/pets/:id` → Actualiza mascota
+- `DELETE /api/pets/:id` → Elimina mascota
 
-## Pruebas
-Usar Postman, Insomnia o el navegador para probar los endpoints en `http://localhost:8080`.
+**API - Adopciones:**
+- `GET /api/adoptions` → Lista todas las adopciones
+- `GET /api/adoptions/:id` → Obtiene adopción por ID
+- `POST /api/adoptions` → Crea nueva adopción
+- `PUT /api/adoptions/:id` → Actualiza estado de adopción
+- `DELETE /api/adoptions/:id` → Elimina adopción
+- `GET /api/adoptions/user/:userId` → Adopciones por usuario
+- `GET /api/adoptions/pet/:petId` → Adopciones por mascota
+
+## 🧪 Testing
+
+### Cobertura de Tests
+- ✅ Tests funcionales completos para adoption.router.js
+- ✅ Tests de integración con base de datos
+- ✅ Tests de casos de éxito y error
+- ✅ Validación de datos y manejo de errores
+
+### Ejecutar Tests
+```bash
+# Tests con Jest
+npm test
+
+# Tests en modo watch
+npm run test:watch
+
+# Tests con coverage
+npm test -- --coverage
+```
+
+## 🛠️ Tecnologías Utilizadas
+
+- **Node.js** - Runtime de JavaScript
+- **Express.js** - Framework web
+- **MongoDB** - Base de datos NoSQL
+- **Mongoose** - ODM para MongoDB
+- **Swagger/OpenAPI** - Documentación de API
+- **Jest + Supertest** - Framework de testing
+- **Docker** - Contenedorización
+- **Faker.js** - Generación de datos mock
+- **bcrypt** - Encriptación de contraseñas
+
+## 📁 Estructura del Proyecto
+
+```
+├── config/
+│   └── swagger.js          # Configuración Swagger/OpenAPI
+├── models/
+│   ├── User.js            # Modelo de Usuario
+│   ├── Pet.js             # Modelo de Mascota
+│   └── Adoption.js        # Modelo de Adopción
+├── routes/
+│   ├── users.router.js    # Rutas de usuarios (con Swagger docs)
+│   ├── pets.router.js     # Rutas de mascotas
+│   ├── mocks.router.js    # Rutas de mocking
+│   └── adoption.router.js # Rutas de adopciones (completas)
+├── tests/
+│   ├── setup.js           # Configuración de tests
+│   └── adoption.router.test.js # Tests funcionales adopciones
+├── utils/
+│   └── mocking.js         # Utilidades para generar datos mock
+├── public/
+│   ├── index.html         # Frontend moderno
+│   ├── app.js             # JavaScript del frontend
+│   └── styles.css         # Estilos CSS
+├── Dockerfile             # Configuración Docker
+├── .dockerignore          # Archivos excluidos de Docker
+├── jest.config.json       # Configuración Jest
+├── healthcheck.js         # Health check para Docker
+└── index.js               # Servidor principal
+```
+
+## 🐳 Información Docker
+
+### Imagen en DockerHub
+- **Repositorio:** `emisilva/backend3-entregable`
+- **Tags disponibles:** `latest`, `v1.0.0`
+- **Tamaño:** ~150MB (optimizada con Alpine Linux)
+
+### Características del Container
+- ✅ Imagen base: Node.js 18 Alpine
+- ✅ Usuario no-root para seguridad
+- ✅ Health check integrado
+- ✅ Variables de entorno configurables
+- ✅ Puerto 8080 expuesto
+- ✅ Optimizado para producción
+
+### Variables de Entorno
+```bash
+NODE_ENV=production          # Entorno de ejecución
+PORT=8080                   # Puerto del servidor
+MONGODB_URI=mongodb://...   # URI de MongoDB
+```
+
+## 🔧 Mejoras Implementadas
+
+### Entrega N°1
+- ✅ Router de mocks con endpoints migrados
+- ✅ Módulo de mocking para usuarios con validaciones
+- ✅ Endpoint /mockingusers (50 usuarios)
+- ✅ Endpoint /generateData con inserción en BD
+- ✅ Servicios GET para verificación
+
+### Entrega Final
+- ✅ Documentación Swagger completa para módulo Users
+- ✅ Router adoption.router.js con 8 endpoints completos
+- ✅ Tests funcionales exhaustivos (100% coverage adoption router)
+- ✅ Dockerfile optimizado y funcional
+- ✅ Imagen subida a DockerHub
+- ✅ README.md actualizado con instrucciones Docker
+
+## 🚦 Pruebas
+
+### Usando el navegador
+- Interfaz web: `http://localhost:8080`
+- Documentación: `http://localhost:8080/api-docs`
+
+### Usando herramientas de API
+- Postman, Insomnia o Thunder Client
+- Importar endpoints desde Swagger
+- Probar todos los endpoints CRUD
+
+### Usando Docker
+```bash
+# Verificar que el contenedor está funcionando
+docker ps
+
+# Ver logs del contenedor
+docker logs backend3-app
+
+# Health check manual
+docker exec backend3-app node healthcheck.js
+```
+
+
+
+## 👨‍💻 Autor
+**Emiliano Silva** 
+
+---
+
+🎯 **Proyecto completamente funcional con Docker, Swagger y Tests!** 🎯
 
 

@@ -1,20 +1,33 @@
 const express = require('express');
 const router = express.Router();
 
-// Endpoint /mockingpets migrado aquí
-router.get('/mockingpets', (req, res) => {
-  // Aquí irá la lógica original de mockingpets
-  res.json({ message: 'Endpoint /mockingpets funcionando en mocks.router.js' });
-});
+// Endpoints de mocking para la aplicación
 
-// Endpoint GET /mockingusers y POST /generateData se agregarán aquí
-
-const { generateMockUsers } = require('../utils/mocking');
+const { generateMockUsers, generateMockPets, generateSimpleMockData } = require('../utils/mocking');
 
 // GET /mockingusers: genera 50 usuarios mock
 router.get('/mockingusers', (req, res) => {
-  const users = generateMockUsers(50);
-  res.json(users);
+  try {
+    const users = generateMockUsers(50);
+    res.json(users);
+  } catch (error) {
+    // Fallback para entorno Docker
+    const simpleData = generateSimpleMockData();
+    res.json(Array(50).fill(simpleData.users[0]));
+  }
+});
+
+// GET /mockingpets: genera mascotas mock realistas
+router.get('/mockingpets', (req, res) => {
+  try {
+    const count = parseInt(req.query.count) || 10;
+    const pets = generateMockPets(count);
+    res.json(pets);
+  } catch (error) {
+    // Fallback para entorno Docker
+    const simpleData = generateSimpleMockData();
+    res.json(Array(10).fill(simpleData.pets[0]));
+  }
 });
 
 module.exports = router;
@@ -35,14 +48,25 @@ router.post('/generateData', async (req, res) => {
     const createdUsers = await User.insertMany(mockUsers);
 
     // Generar mascotas
-    const mockPets = [];
-    for (let i = 0; i < pets; i++) {
-      const owner = createdUsers.length > 0 ? createdUsers[Math.floor(Math.random() * createdUsers.length)]._id : null;
-      mockPets.push({
-        name: `Pet${i + 1}`,
-        species: 'dog',
-        owner
+    let mockPets = [];
+    try {
+      mockPets = generateMockPets(pets);
+      // Asignar algunos owners aleatorios
+      mockPets.forEach(pet => {
+        if (createdUsers.length > 0 && Math.random() > 0.3) {
+          pet.owner = createdUsers[Math.floor(Math.random() * createdUsers.length)]._id;
+        }
       });
+    } catch (error) {
+      // Fallback simple
+      for (let i = 0; i < pets; i++) {
+        const owner = createdUsers.length > 0 ? createdUsers[Math.floor(Math.random() * createdUsers.length)]._id : null;
+        mockPets.push({
+          name: `Pet${i + 1}`,
+          species: 'perro',
+          owner
+        });
+      }
     }
     const createdPets = await Pet.insertMany(mockPets);
 
