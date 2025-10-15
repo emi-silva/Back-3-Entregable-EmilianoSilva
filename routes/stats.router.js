@@ -6,6 +6,59 @@ const Adoption = require('../models/Adoption');
 
 /**
  * @swagger
+ * /api/stats:
+ *   get:
+ *     summary: Obtener estadísticas básicas del refugio
+ *     tags: [Estadísticas]
+ *     responses:
+ *       200:
+ *         description: Estadísticas básicas del refugio
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 totalPets:
+ *                   type: number
+ *                 totalUsers:
+ *                   type: number
+ *                 totalAdoptions:
+ *                   type: number
+ *                 availableEndpoints:
+ *                   type: array
+ */
+router.get('/', async (req, res) => {
+  try {
+    const totalPets = await Pet.countDocuments();
+    const totalUsers = await User.countDocuments();
+    const totalAdoptions = await Adoption.countDocuments();
+    
+    res.json({
+      message: 'API de Estadísticas del Refugio de Mascotas',
+      summary: {
+        totalPets,
+        totalUsers,
+        totalAdoptions
+      },
+      availableEndpoints: [
+        'GET /api/stats/dashboard - Estadísticas completas',
+        'GET /api/stats/search - Búsqueda avanzada de mascotas',
+        'GET /api/stats/adoptions - Estadísticas de adopciones'
+      ],
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      error: 'Error obteniendo estadísticas básicas', 
+      details: error.message 
+    });
+  }
+});
+
+/**
+ * @swagger
  * /api/stats/dashboard:
  *   get:
  *     summary: Obtener estadísticas completas del refugio

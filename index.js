@@ -163,6 +163,40 @@ if (process.env.DOCKER_ENV) {
     res.json(pets);
   });
   
+  simpleMocksRouter.get('/generateData', (req, res) => {
+    const users = parseInt(req.query.users) || 10;
+    const pets = parseInt(req.query.pets) || 5;
+    
+    const mockUsers = Array.from({ length: users }, (_, i) => ({
+      _id: `mock_user_${i}`,
+      first_name: `Usuario${i}`,
+      last_name: `Test${i}`,
+      email: `usuario${i}@test.com`,
+      role: i % 2 === 0 ? 'user' : 'admin'
+    }));
+
+    const mockPets = Array.from({ length: pets }, (_, i) => ({
+      _id: `mock_pet_${i}`,
+      name: `Mascota${i}`,
+      species: 'perro',
+      breed: 'Mestizo',
+      age: Math.floor(Math.random() * 12) + 1,
+      color: 'marrón',
+      adoptionStatus: 'disponible'
+    }));
+
+    res.json({ 
+      message: `Datos mock generados: ${users} usuarios y ${pets} mascotas (Docker mode)`, 
+      users: mockUsers,
+      pets: mockPets,
+      total: {
+        users: mockUsers.length,
+        pets: mockPets.length
+      },
+      note: 'En Docker se usa generación simplificada sin faker'
+    });
+  });
+
   simpleMocksRouter.post('/generateData', (req, res) => {
     const { users = 0, pets = 0 } = req.body;
     res.json({ 
